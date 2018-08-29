@@ -1,25 +1,27 @@
 # Documentation: http://docs.travis-ci.com/user/languages/julia/
 language: julia
+
 os:
   - linux
   - osx
+
 julia:
   - 0.6
   - 0.7
   - nightly
 
 # override the default test script
-script:
-  - julia -e 'Pkg.clone(pwd());
-        Pkg.build("FeigenbaumUtil");
-        Pkg.test("FeigenbaumUtil"; coverage=true)'
+#script:
+#  - julia -e 'Pkg.clone(pwd());
+#        Pkg.build("FeigenbaumUtil");
+#        Pkg.test("FeigenbaumUtil"; coverage=true)'
   #- if [ $TRAVIS_OS_NAME = "linux" ]; then $TESTCMD -e 'map(Pkg.add, ["Plots", "Images", "ImageView", "StatsBase"])'; fi
   #- if [ $TRAVIS_OS_NAME = "linux" ]; then $TESTCMD -e 'include(joinpath("src", "GraphicsExamples.jl")); plotbifurcationdiagram("Log", 0.4, 0.8, 10)'; fi
 
 after_success:
-  - if [ $TRAVIS_OS_NAME = "linux" ]; then julia -e 'Pkg.add("Documenter")'; fi
-  - if [ $TRAVIS_OS_NAME = "linux" ]; then $TESTCMD 'cd(Pkg.dir("FeigenbaumUtil")); include(joinpath("docs", "make.jl"))'; fi
+  - if [ $TRAVIS_OS_NAME = "linux" ]; then julia -e "VERSION >= v\"0.7.0-DEV.5183\" && using Pkg; Pkg.add(\"Documenter\"); Pkg.add(\"Coverage\")"; fi
+  - if [ $TRAVIS_OS_NAME = "linux" ]; then julia -e 'include(joinpath("docs", "make.jl"))'; fi
   # push coverage results to Coveralls
-  - if [ $TRAVIS_OS_NAME = "linux" ]; then julia -e 'cd(Pkg.dir("FeigenbaumUtil")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'; fi
+  - if [ $TRAVIS_OS_NAME = "linux" ]; then julia -e 'using Coverage; Coveralls.submit(Coveralls.process_folder())'; fi
   # push coverage results to Codecov
-  - if [ $TRAVIS_OS_NAME = "linux" ]; then julia -e 'cd(Pkg.dir("FeigenbaumUtil")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'; fi
+  - if [ $TRAVIS_OS_NAME = "linux" ]; then julia -e 'using Coverage; Codecov.submit(Codecov.process_folder())'; fi
